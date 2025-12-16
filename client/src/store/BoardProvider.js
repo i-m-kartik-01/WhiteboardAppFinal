@@ -1,7 +1,7 @@
 import React, { useReducer, useCallback } from "react";
 import boardContext from "./board-context";
 import { BOARD_ACTIONS, TOOL_ACTION_TYPES, TOOL_ITEMS } from "../constants";
-import { createRoughElement, isPointNearElement } from "../utils/element";
+import { createRoughElement } from "../utils/element";
 import api from "../api/axios";
 
 const boardReducer = (state, action) => {

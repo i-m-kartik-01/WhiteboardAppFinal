@@ -1,4 +1,4 @@
-import React, { createContext, useReducer } from 'react'
+import React, { useReducer } from 'react'
 import toolboxContext from './toolbox-context';
 import { COLORS, TOOL_ITEMS, TOOLBOX_ACTIONS } from '../constants';
 

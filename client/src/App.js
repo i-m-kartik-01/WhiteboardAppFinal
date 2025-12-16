@@ -5,7 +5,7 @@ import ProfilePage from "./pages/profilePage";
 import CanvasPage from "./pages/canvasPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import { io } from 'socket.io-client';
+// import { io } from 'socket.io-client';
 
 function App() {
   

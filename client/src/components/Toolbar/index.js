@@ -3,7 +3,7 @@ import classes from "./index.module.css"
 import cx from "classnames"
 import { MdOutlineFormatColorText } from "react-icons/md"
 import { LuRectangleHorizontal } from 'react-icons/lu'
-import { FaSlash, FaPaintBrush, FaRegCircle, FaArrowRight, FaDownload, FaUndo, FaRedo, FaBrush, FaEraser, FaSave } from 'react-icons/fa'
+import { FaSlash, FaPaintBrush, FaRegCircle, FaArrowRight, FaDownload, FaUndo, FaRedo, FaEraser, FaSave } from 'react-icons/fa'
 import boardContext from '../../store/board-context'
 import { TOOL_ITEMS } from '../../constants'
 
