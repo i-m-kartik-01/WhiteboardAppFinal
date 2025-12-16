@@ -1,20 +1,19 @@
-import  { createContext } from 'react'
+import { createContext } from "react";
 
 const boardContext = createContext({
-    canvasId: null,  
-    activeToolItem: "",
-    toolActionType: "",
-    elements: [],
-    history: [[]],
-    index: 0,
-    canvasId: "",
-    
-    boardMouseDownHandler: () => {},
-    changeToolHandler: () => {},
-    boardMouseMoveHandler: () => {},
-    boardMouseUpHandler: () => {},
-    textAreaBlurHandler: () => {},
-    saveCanvas: () => {},
-}) 
+  canvasId: null,
+  activeToolItem: "",
+  toolActionType: "",
+  elements: [],
+  history: [[]],
+  index: 0,
 
-export default boardContext
+  boardMouseDownHandler: () => {},
+  changeToolHandler: () => {},
+  boardMouseMoveHandler: () => {},
+  boardMouseUpHandler: () => {},
+  textAreaBlurHandler: () => {},
+  saveCanvas: () => {},
+});
+
+export default boardContext;
