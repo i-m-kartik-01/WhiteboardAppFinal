@@ -14,16 +14,20 @@ export const createRoughElement = (
   y1,
   x2,
   y2,
-  { type, stroke, fill, size }
+  options,
+  userId
 ) => {
+  const { type, stroke, fill, size } = options;
+
   switch (type) {
     case TOOL_ITEMS.BRUSH:
       return {
         id,
         type,
-        points: [[x1, y1]], // ✅ ALWAYS [x, y]
+        points: [[x1, y1]],
         stroke,
         size,
+        userId,
       };
 
     case TOOL_ITEMS.TEXT:
@@ -35,6 +39,7 @@ export const createRoughElement = (
         text: "",
         stroke,
         size,
+        userId,
       };
 
     default:
@@ -48,6 +53,7 @@ export const createRoughElement = (
         stroke,
         fill,
         size,
+        userId,
       };
   }
 };
@@ -158,7 +164,9 @@ export const isPointNearElement = (element, x, y) => {
       );
 
     case TOOL_ITEMS.BRUSH: {
-      const ctx = document.getElementById("canvas").getContext("2d");
+      const canvas = document.getElementById("canvas");
+      if (!canvas) return false;
+      const ctx = canvas.getContext("2d");
       return element.path && ctx.isPointInPath(element.path, x, y);
     }
 

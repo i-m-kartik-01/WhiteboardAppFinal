@@ -1,10 +1,12 @@
-import React, { useReducer, useState } from "react";
+import React, { useReducer, useCallback } from "react";
 import boardContext from "./board-context";
 import { BOARD_ACTIONS, TOOL_ACTION_TYPES, TOOL_ITEMS } from "../constants";
 import { createRoughElement, isPointNearElement } from "../utils/element";
 import api from "../api/axios";
-import { useEffect } from "react";
 
+/* =========================
+   REDUCER
+   ========================= */
 const boardReducer = (state, action) => {
   switch (action.type) {
     case BOARD_ACTIONS.CHANGE_TOOL:
@@ -53,44 +55,31 @@ const boardReducer = (state, action) => {
     }
 
     case BOARD_ACTIONS.DRAW_UP: {
-  if (
-    state.toolActionType !== TOOL_ACTION_TYPES.DRAWING &&
-    state.toolActionType !== TOOL_ACTION_TYPES.ERASING
-  ) {
-    return state;
-  }
+      if (state.toolActionType !== TOOL_ACTION_TYPES.DRAWING) return state;
 
-  const history = state.history.slice(0, state.index + 1);
-  history.push([...state.elements]);
+      const history = state.history.slice(0, state.index + 1);
+      history.push(state.elements);
 
-  return {
-    ...state,
-    history,
-    index: state.index + 1,
-    toolActionType: TOOL_ACTION_TYPES.NONE
-  };
-}
-
-
-
-    case BOARD_ACTIONS.ERASE: {
-      const filtered = state.elements.filter(
-        (el) =>
-          !isPointNearElement(
-            el,
-            action.payload.clientX,
-            action.payload.clientY
-          )
-      );
-      return { ...state, elements: filtered };
+      return {
+        ...state,
+        history,
+        index: history.length - 1,
+        toolActionType: TOOL_ACTION_TYPES.NONE,
+      };
     }
+
+    case BOARD_ACTIONS.SET_ELEMENTS:
+      return {
+        ...state,
+        elements: action.payload.elements,
+      };
 
     case BOARD_ACTIONS.UNDO:
       return state.index > 0
         ? {
             ...state,
-            elements: state.history[state.index - 1],
             index: state.index - 1,
+            elements: state.history[state.index - 1],
           }
         : state;
 
@@ -98,8 +87,8 @@ const boardReducer = (state, action) => {
       return state.index < state.history.length - 1
         ? {
             ...state,
-            elements: state.history[state.index + 1],
             index: state.index + 1,
+            elements: state.history[state.index + 1],
           }
         : state;
 
@@ -108,6 +97,9 @@ const boardReducer = (state, action) => {
   }
 };
 
+/* =========================
+   PROVIDER
+   ========================= */
 const BoardProvider = ({ children, initialElements = [], canvasId }) => {
   const [state, dispatch] = useReducer(boardReducer, {
     activeToolItem: TOOL_ITEMS.BRUSH,
@@ -117,22 +109,39 @@ const BoardProvider = ({ children, initialElements = [], canvasId }) => {
     index: 0,
   });
 
- 
+  /* =========================
+     SERVER-AUTHORITATIVE SET
+     ========================= */
+  const setElements = useCallback((elements) => {
+    dispatch({
+      type: BOARD_ACTIONS.SET_ELEMENTS,
+      payload: { elements },
+    });
+  }, []);
+
+  /* =========================
+     SAVE TO DB (optional)
+     ========================= */
   const saveCanvas = async () => {
     await api.put("/canvas/updateCanvas", {
       canvasId,
       elements: state.elements,
     });
-    console.log("saved succesfully");
   };
 
   return (
     <boardContext.Provider
       value={{
         ...state,
+
+        /* 🔑 REQUIRED */
+        setElements,
         saveCanvas,
+
+        /* tool handlers */
         changeToolHandler: (tool) =>
           dispatch({ type: BOARD_ACTIONS.CHANGE_TOOL, payload: { tool } }),
+
         boardMouseDownHandler: (e, toolbox) =>
           dispatch({
             type: BOARD_ACTIONS.DRAW_DOWN,
@@ -144,16 +153,16 @@ const BoardProvider = ({ children, initialElements = [], canvasId }) => {
               size: toolbox[state.activeToolItem]?.size,
             },
           }),
+
         boardMouseMoveHandler: (e) =>
           dispatch({
             type: BOARD_ACTIONS.DRAW_MOVE,
             payload: { clientX: e.clientX, clientY: e.clientY },
           }),
-        boardMouseUpHandler: () =>{
-            console.log("DISPATCH DRAW_UP");
-            dispatch({ type: BOARD_ACTIONS.DRAW_UP });
-        },
-          
+
+        boardMouseUpHandler: () =>
+          dispatch({ type: BOARD_ACTIONS.DRAW_UP }),
+
         undo: () => dispatch({ type: BOARD_ACTIONS.UNDO }),
         redo: () => dispatch({ type: BOARD_ACTIONS.REDO }),
       }}

@@ -5,8 +5,12 @@ import ProfilePage from "./pages/profilePage";
 import CanvasPage from "./pages/canvasPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+import { io } from 'socket.io-client';
+
 function App() {
+  
   return (
+    
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
@@ -34,3 +38,6 @@ function App() {
 }
 
 export default App;
+
+// Connect to the WebSocket server
+
