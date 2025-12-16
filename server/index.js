@@ -11,7 +11,7 @@ const canvasRouter = require("./routes/canvasRoutes");
 
 
 const app = express();
-const PORT = 5003;
+const PORT = process.env.PORT || 5003;
 
 /* =========================
    EXPRESS MIDDLEWARE
