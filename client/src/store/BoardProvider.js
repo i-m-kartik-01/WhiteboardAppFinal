@@ -4,9 +4,6 @@ import { BOARD_ACTIONS, TOOL_ACTION_TYPES, TOOL_ITEMS } from "../constants";
 import { createRoughElement, isPointNearElement } from "../utils/element";
 import api from "../api/axios";
 
-/* =========================
-   REDUCER
-   ========================= */
 const boardReducer = (state, action) => {
   switch (action.type) {
     case BOARD_ACTIONS.CHANGE_TOOL:
@@ -97,9 +94,6 @@ const boardReducer = (state, action) => {
   }
 };
 
-/* =========================
-   PROVIDER
-   ========================= */
 const BoardProvider = ({ children, initialElements = [], canvasId }) => {
   const [state, dispatch] = useReducer(boardReducer, {
     activeToolItem: TOOL_ITEMS.BRUSH,
@@ -109,9 +103,6 @@ const BoardProvider = ({ children, initialElements = [], canvasId }) => {
     index: 0,
   });
 
-  /* =========================
-     SERVER-AUTHORITATIVE SET
-     ========================= */
   const setElements = useCallback((elements) => {
     dispatch({
       type: BOARD_ACTIONS.SET_ELEMENTS,
@@ -119,9 +110,6 @@ const BoardProvider = ({ children, initialElements = [], canvasId }) => {
     });
   }, []);
 
-  /* =========================
-     SAVE TO DB (optional)
-     ========================= */
   const saveCanvas = async () => {
     await api.put("/canvas/updateCanvas", {
       canvasId,
