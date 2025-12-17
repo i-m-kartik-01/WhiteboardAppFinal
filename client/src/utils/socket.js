@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io(process.env.REACT_APP_API_URL, {
+const socket = io("https://whiteboardapp-c4e7akaea7a6hndk.centralindia-01.azurewebsites.net", {
   path: "/socket.io",
   transports: ["websocket"],
   withCredentials: true,
