@@ -16,7 +16,7 @@ function ProfilePage() {
 
   const fetchCanvases = async () => {
     try {
-      const res = await api.get("/canvas");
+      const res = await api.get("/api/canvas");
       setCanvases(res.data);
     } catch (err) {
       alert("Failed to load canvases");
