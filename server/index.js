@@ -1,7 +1,6 @@
 const express = require("express");
 require("dotenv").config();
 const http = require("http");
-const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { Server } = require("socket.io");
 
@@ -13,25 +12,34 @@ const app = express();
 const PORT = process.env.PORT || 5003;
 
 /* =========================
-   CONSTANTS (IMPORTANT)
+   ALLOWED ORIGINS
    ========================= */
-const FRONTEND_ORIGIN = "https://calm-mud-013ba4c00.3.azurestaticapps.net";
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "https://calm-mud-013ba4c00.3.azurestaticapps.net",
+];
 
 /* =========================
-   GLOBAL CORS FALLBACK (CRITICAL FOR AZURE)
+   GLOBAL CORS + PREFLIGHT (AZURE SAFE)
    ========================= */
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", FRONTEND_ORIGIN);
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header(
+  const origin = req.headers.origin;
+
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
-  res.header(
+  res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS"
   );
 
+  // Handle preflight
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
@@ -42,13 +50,6 @@ app.use((req, res, next) => {
 /* =========================
    EXPRESS MIDDLEWARE
    ========================= */
-app.use(
-  cors({
-    origin: FRONTEND_ORIGIN,
-    credentials: true,
-  })
-);
-console.log("FRONTEND_URL =", process.env.FRONTEND_URL);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -70,14 +71,11 @@ connectDB();
 const server = http.createServer(app);
 
 /* =========================
-   SOCKET.IO (AZURE SAFE CONFIG)
+   SOCKET.IO (CORRECT AZURE CONFIG)
    ========================= */
 const io = new Server(server, {
-  path: "/socket.io",
-  transports: ["websocket"], // 🚀 avoid polling issues
   cors: {
-    origin: FRONTEND_ORIGIN,
-    methods: ["GET", "POST"],
+    origin: ALLOWED_ORIGINS,
     credentials: true,
   },
 });
@@ -120,9 +118,7 @@ io.on("connection", (socket) => {
     const elements = canvases.get(canvasId);
     elements.push(element);
 
-    io.to(canvasId).emit("canvas-sync", {
-      elements,
-    });
+    io.to(canvasId).emit("canvas-sync", { elements });
   });
 
   socket.on("disconnect", () => {
