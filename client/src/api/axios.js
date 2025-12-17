@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: "https://whiteboardapp-c4e7akaea7a6hndk.centralindia-01.azurewebsites.net/api",
   withCredentials: true, // REQUIRED for refreshToken cookie
 });
 
